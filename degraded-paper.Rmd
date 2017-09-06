@@ -527,7 +527,7 @@ ggplot(result, aes(x = level, y = value, colour = fixed)) +
     xlab("Land Proportion")
 ```
 
-Figure \@ref(fig:featexp) gives  feature expression for known matches, as a function of the proportion of land impression recovered. It is immediately obvious that the variability in feature expression is large when only a small fraction of the land is recovered, such as 25%. For instance, `sum_peaks` and  `cms` both drop, while `D` rises. Interestingly, some of the features are better expressed for the middle-fixed case. Overall, feature expression remains relatively consistent as long as we recover 50% or more of the land impression.
+Figure \@ref(fig:featexp) gives feature expression for known matches, as a function of the proportion of land impression recovered. It is immediately obvious that the variability in feature expression is large when only a small fraction of the land is recovered, such as 25%. For instance, `sum_peaks` and  `cms` both drop, while `D` rises. Interestingly, some of the features are better expressed for the middle-fixed case. Overall, feature expression remains relatively consistent as long as we recover 50% or more of the land impression. Feature \@ref(fig:featexp2) shows the feature expression for known non-matches by comparison.
 
 ```{r featexp, echo=FALSE, fig.cap='Feature expression for known matches, as a function of land proportion. It can be seen that when we fix the middle portion of the bullet land, the features tend to be better expressed.'}
 feature_exp <- CCFs_withlands_degrade %>%
@@ -541,6 +541,27 @@ feature_exp <- CCFs_withlands_degrade %>%
            level = degrade_left + degrade_right)
 
 ggplot(data = feature_exp, aes(x = level, y = value, colour = fixed)) +
+    geom_point() +
+    geom_line() +
+    theme_bw() +
+    theme(legend.position = "bottom") +
+    scale_x_continuous(breaks = c(0, .25, .5, .75), labels = c("100%", "75%", "50%", "25%")) +
+    xlab("Land Proportion") +
+    facet_wrap(~feature, scales = "free_y")
+```
+
+```{r featexp2, echo=FALSE, fig.cap='Feature expression for known non-matches, as a function of land proportion. Patterns of feature expression as a function are far less visible in this case.'}
+feature_exp2 <- CCFs_withlands_degrade %>%
+    filter(!match) %>%
+    dplyr::select(degrade_left, degrade_right, ccf, rough_cor, D, matches, mismatches, cms, non_cms, sum_peaks) %>%
+    gather(key = feature, value = value, 3:ncol(.)) %>%
+    group_by(degrade_left, degrade_right, feature) %>%
+    summarise(value = mean(value, na.rm = TRUE)) %>%
+    ungroup() %>%
+    mutate(fixed = ifelse(degrade_left == 0 & degrade_right == 0, "full", ifelse(degrade_left == 0, "left", ifelse(degrade_right == 0, "right", "middle"))),
+           level = degrade_left + degrade_right)
+
+ggplot(data = feature_exp2, aes(x = level, y = value, colour = fixed)) +
     geom_point() +
     geom_line() +
     theme_bw() +
