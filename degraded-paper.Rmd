@@ -13,7 +13,7 @@ fontsize: 12pt
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
 ```
 
 \textbf{Abstract}
@@ -926,9 +926,7 @@ As we have stated before, the lack of 3D images of bullets limits the extent to 
 
 \clearpage
 
-# Appendix
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, results='asis'}
+```{r, eval=FALSE, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.pos='H', results='asis'}
 all_combinations <- combn(unique(c(as.character(CCFs_features$Study), as.character(CCFs_features$Study))), 2, simplify = FALSE)
 
 myresult <- all_combinations %>% map_df(function(x) {
@@ -969,7 +967,7 @@ final_result$nonmatchtest[final_result$nonmatchtest < .0001] <- "< 0.0001"
 print(xtable(final_result[,1:7], digits = c(0, 0, 0, 0, 0, 4, 0, 4), label = "tab:kstests", caption = "Results for the Kolmogrov-Smirnov distributional test."), comment = FALSE, include.rownames = FALSE)
 ```
 
-```{r deghist, echo=FALSE, fig.cap='Histograms of matching probability, facetted by the degradation level and known match versus known non-match.', fig.height=9.5, fig.width=8}
+```{r eval=FALSE, deghist, echo=FALSE, fig.cap='Histograms of matching probability, facetted by the degradation level and known match versus known non-match.', fig.height=9.5, fig.width=8, fig.pos='H'}
 p1 <- ggplot(data = filter(CCFs_withlands_plot, degrade_left == 0), aes(x = forest)) +
     geom_histogram() +
     facet_grid(match~degrade_right, scales = "free_y") +
@@ -989,7 +987,7 @@ p3 <- ggplot(data = filter(CCFs_withlands_plot, (degrade_left == 0 & degrade_rig
 grid.arrange(p1, p2, p3, nrow = 3)
 ```
 
-```{r firstscore, echo=FALSE, fig.cap='Score distributions for the naive approach to bullet matching, for known matches and known non-matches.'}
+```{r eval=FALSE, firstscore, echo=FALSE, fig.cap='Score distributions for the naive approach to bullet matching, for known matches and known non-matches.', fig.pos='H'}
 result <- CCFs_withlands %>%
     group_by(study.x, barrel.x, bullet.x, study.y, barrel.y, bullet.y) %>%
     summarise(forest = mean(head(sort(forest, decreasing = TRUE))), match = any(match))
@@ -998,3 +996,5 @@ ggplot(data = result, aes(x = match, y = forest)) +
     geom_boxplot() +
     theme_bw()
 ```
+
+# References
