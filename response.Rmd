@@ -1,0 +1,88 @@
+---
+title: "Response to reviewers"
+author: "Eric Hare, Heike Hofmann, Alicia Carriquiry"
+date: "October 5th, 2017"
+output:
+  pdf_document: default
+bibliography: references.bib
+---
+
+# Reviewer 1
+
+1. *pp. 4  first paragraph of section “3 Model Training”, the author state: "Thus, every Cary bullet is a known match to every other Cary bullet, although early firings do not produce the same markings that later firings do." The authors did not study this here or elsewhere. The authors also did not cite a study that indicated this conclusion. The second half of that statement may very well be true, but  stating it anecdotally should not appear in a research paper.  I’d suggest the minor change: "Thus every Cary bullet is a known match to every other Cary bullet"*
+
+  **Thank you for the comment. We have made this change.**
+  
+2. *pp8-9, 11, 25: The authors highlight operator effect on the data acquisition process in the study. The instrumentation used to acquire data requires skill and experience. Naturally that brings up the question as to who was operating the microscope? The authors must state (in at least rough terms) the level of expertise of the operator(s). Were they students new to the technology? Were the operators familiar with the quirks of the surfaces they were looking at? Were they professional surface metrologists or company technicians? I would expect significant operator effects if data is collected by operators inexperienced  with the instrumentation, surface metrology and/or firearms analysis.*
+
+  **In this case, the operators were experienced surface metrologists at NIST. The presence of operator effects was not a conclusion meant to insinuate that these experts performed the scans poorly, but rather that there is variability in the procedures and standards used. The paper has been updated to include this information.**
+  
+3. *Page 11,  last paragraph the authors state: "This result strongly suggests that the operator effect in the bullet scanning procedure must be taken into account in order to assume pairwise independence." I don’t understand this statement at all. Do the authors mean independence between features? The pair-wise comparisons between the feature vectors in this study obviously ARE NOT independent (and the features are likely not independent either…). I’m guessing I'm not understanding something; or the author's logic. I suggest the authors expand this paragraph a bit and clarify the statement.*
+
+  **Apologies. The intent here in terms of independence was pairwise independence of scans between the two studies. Because Hamby 252 and Hamby 44 were scans collected on bullets fired from the same gun barrels, assuming that microscope operation and the scanning procedure is precisely defined and perfect, there should be independence between the scans conducted by different operators, and therefore the features derived from these scans should be the same, independent of who conducted the scan. We have clarified this in the manuscript.**
+  
+4. *pp14, last paragraph which discusses tank rash on a surface. The authors state: "We extract a signature from the unaffected half and attempt to match this signature to its full known match." Just out of curiosity, how did the authors segment out tank rash? Automatically or subjectively by hand? Could they please state explicitly."*
+
+  **This was determined subjectively by visual inspection, and we have clarified that point in the paper.**
+  
+5. *pp18 section 5 “From Lands to Bullets”. A very similar model was already presented by Chu et al in 2010: Chu et al. J Forensic Sci, March 2010, Vol. 55, No. 2.  pp. 341-347. It should be cited and deserves at least a sentence of discussion/comparison...*
+
+  **Thank you. We have added this citation and added some discussion of the differences compared to our approach.**
+
+# Reviewer 2
+
+1. *In this case, I doubt the usability of their method in other real cases or other set of barrels. So saying the features are robust will be only for this specific barrel unless proven in other cases (datasets)*
+
+  **We do agree that much more work needs to be done to assess the performance of the algorithm in real cases, and in the case of other barrels. At the time of writing, further data was not publicly available to us, and that is why we elected to assess what effects were available (operator or study effects in the bullet scanning process), or to simulate conditions that may be more indicative of a real-world scenario (degraded land impressions). The features used were derived and standardized such that we believe they will be applicable to out-of-sample real world data as we continue to obtain it. Indeed, we've seen some promising results with bullet sets sent to us by police departments since the time of writing.**
+  
+2. *The partitioning procedure of the data to 80%-20% is unclear. It seems the authors partitioning after getting the all pairwise land-to-land comparisons. This will skew the error rate and won’t represent the true error rate if new barrel/bullet is applied to this algorithm. Instead, try to keep out one bullet from each barrel/ or keep out a whole barrel to assess the error rate correctly.*
+
+  **Thank you for the feedback. We have redone the partitioning scheme and clarified the method in the paper. As you suggested, we have elected to hold out 20% of the barrels, and then used all land-to-land comparisons between lands in these barrels. The results match very closely to the previous scheme, with a very high specificity and a relatively lower sensitivity.**
+  
+3. *The overlayed density plots in Figure 3 needs to have better description. Are you looking at all pairwise known non match scores in the figure? What is the point you are trying to make — symmetric and normally distributed vs skewed ? Does the two features differ? in what way? Is one better than the other? In addition, what bandwidth was used. Did you use the default? In that case, it will depend on the number of matches and non matches. I suspect if you use the same bandwidth, the overlap will be different. Please use Empirical - CDF plots instead to avoid the issue of bandwidth selection for the two groups and will give better view of the plots and corresponding error rates.*
+
+  **We have updated these plots to use empirical CDF plots, as per your advice about the bandwidth issue. Thanks for pointing this out. We have also clarified the descriptions of these plots to indicate the relevant information, including the symmetry of each distribution and the differences across the features.**
+  
+4. *Try to summarize Figures 12-15 in one figure- side by side boxplots should work fine.*
+
+  **These figures have been updated. Thank you.**
+
+5. *The latter part of the paper is hard to follow. It appears that some of the figures and tables are missing from the paper (See pages 11 and 18). If this is to be published it needs a significant rewrite and reorganization from the current form.*
+
+  **We have updated this section to include the missing figures and tables, and reorganized them as appropriate. We hope you agree the new structure of this section is much easier to follow.**
+
+6. *P 2 paragraph 2 “Real world applications ... “ the statements made here need citations*
+
+  **Citations have been added for these statements.**
+
+7. *P 3 features description: indicate which ones are new features vs already proposed ones*
+
+  **This has now been included.**
+
+8. *P 8 describe data partitioning method more clearly. Make sure the test set is correlated with the validation set.*
+
+  **Thank you, we have clarified the data partitioning used and revised it based on your advice.**
+  
+9. *P 8 “It can be seen that Hamby252 to Hamby252 comparisons exhibit the fewest errors, while Hamby252 to Hamby44 comparisons exhibit the most on average” — the ideal would be to have equal error rates in all cases - data partitioning method may solve this issue*
+
+  **The new data partitioning scheme has improved the results, however hasn't completely eliminated this effect. The discussion has been updated to reflect the new results.**
+  
+10. *P 9 “... resemble very closely the feature distribution of the true negatives, with a slightly higher average ccf.” add sentence describing what that section is going to be about — then discuss the plot and rest of the subsection*
+
+  **We have added this clarifying sentence.**
+
+11. *P 9 Figure 4 — make better choice of colors and line types for black and white version of the paper. Same with Figure 5*
+
+  **We have updated the figures accordingly, combining them into one figure in the process.**
+
+12. *P 11 missing table*
+
+  **Apologies. This has been corrected.**
+  
+12. *P 18 missing figure*
+
+  **This has also been corrected.**
+  
+13. *P19 avoid equation number on each line of the equation - this is a straight forward calculation and do not need to be explained line by line - “Where” after the equation should be “where”*
+
+  **Updated. Thank you.**
