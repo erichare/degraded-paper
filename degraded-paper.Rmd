@@ -1021,6 +1021,10 @@ Finally, one pleasing conclusion from these results is the fact that generalizin
 
 As we have stated before, the lack of 3D images of bullets available in the public domain limits the extent to which these algorithms can be tested and validated. The degraded land simulation itself may be too simplistic and not faithfully represent realistic scenarios. However, as more data are collected, we can continue to update, train, and test the matching algorithm in order to improve its performance in real datasets.
 
+# Acknowledgment
+
+We wish to acknowledge the anonymous reviewers, whose quick yet thorough and immensely helpful reviews helped us improve this manuscript. We greatly appreciate the extra effort put forth for us.
+
 \clearpage
 
 # References
