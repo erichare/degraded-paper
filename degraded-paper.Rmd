@@ -55,7 +55,7 @@ Recently, several authors have addressed these well-known shortcomings. Focusing
 
 Real world applications of bullet matching often involve the recovery of fragments of bullets from the crime scene [@national2004forensic]. Traditional features used in forensic examination work well for a full land, but there has been less investigation into their performance in the case of a fragmented land. For example, the CMS is naturally limited by the portion of the land that can be recovered and varies across manufacturers [@chu:2011].
 
-In this paper, we take steps to address these and other concerns. Specifically, we begin by reviewing features from the literature, computed on pairs of bullet lands, and presenting some of our own features. We propose an approach to  standardize the featues, to account for the fact that only a portion of the land impression may be recovered from the crime scene. With the standardized features, we tackle two issues that were not addressed in  [@2016arXiv160105788H]. The first is the effect of the microscope operator  on the resulting images and consequent algorithm performance. The second issue has to do with the robustness of the land matching algorithm in [@2016arXiv160105788H] relative to the degree of degradation of the questioned land impression. Finally, we describe some of the initial steps toward generalizing a matching algorithm based on land-to-land comparisons, to one based on bullet-to-bullet comparisons, as would be of interest in a real world application of these ideas.
+In this paper, we take steps to address these and other concerns. Specifically, we begin by reviewing features from the literature, computed on pairs of bullet lands, and presenting some of our own features. We propose an approach to  standardize the featues, to account for the fact that only a portion of the land impression may be recovered from the crime scene. With the standardized features, we tackle two issues that were not addressed in  @2016arXiv160105788H. The first is the effect of the microscope operator  on the resulting images and consequent algorithm performance. The second issue has to do with the robustness of the land matching algorithm in @2016arXiv160105788H relative to the degree of degradation of the questioned land impression. Finally, we describe some of the initial steps toward generalizing a matching algorithm based on land-to-land comparisons, to one based on bullet-to-bullet comparisons, as would be of interest in a real world application of these ideas.
 
 # Feature Standardization
 
@@ -425,7 +425,12 @@ study_result_wide <- study_result %>%
     select(-id) %>%
     as.data.frame
 study_result_wide_col <- study_result_wide
-study_result_wide_col[,-1] <- apply(study_result_wide_col[,-1], 2, function(x) paste0(round(100 * x / sum(x), digits = 2), "%"))
+study_result_wide_col[,-1] <- apply(study_result_wide_col[,-1], 2, function(x) {
+    mystr <- paste0(round(100 * x / sum(x), digits = 2), "%")
+    mystr[stringr::str_length(mystr) %in% c(4, 5)] <- paste0("0", mystr[stringr::str_length(mystr) %in% c(4, 5)])
+    
+    return(mystr)
+})
 names(study_result_wide_col)[1] <- "Prediction \\ Actual"
 
 print(xtable(study_result_wide_col, digits = c(0, 0, 3, 3, 3), label = "tab:studypred", caption = "Confusion Matrix (Column Proportions) for the random forest with study as the response. It can be seen that the random forest performs poorly, as hoped, indicating that a simple model to predict the study using the features available is not enough to detect the operator effects."), comment = FALSE, include.rownames = FALSE, table.placement = "H")
@@ -452,7 +457,7 @@ ggplot(CCFs_features, aes(x = Study, y = value)) +
     ylab("Value")
 ```
 
-Though visual inspection clearly shows differences, we can more formally assess the differences between distributions with a Kolmogrov-Smirnov test. Table \ref{tab:kstests} gives the results of pairwise tests, for each feature, between different set comparisons, and between known matches compared with known non-matches. Although most of the tests are significant, looking at the raw values of the D statistic suggest that the largest effect sizes do in fact occur in comparisons with two Hamby252 lands, as the visual inspection of the boxplots also suggested.
+Though visual inspection clearly shows differences, we can more formally assess the differences between distributions with a Kolmogorov-Smirnov test. Table \ref{tab:kstests} gives the results of pairwise tests, for each feature, between different set comparisons, and between known matches compared with known non-matches. Although most of the tests are significant, looking at the raw values of the D statistic suggest that the largest effect sizes do in fact occur in comparisons with two Hamby252 lands, as the visual inspection of the boxplots also suggested.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.pos='H', results='asis'}
 all_combinations <- combn(unique(c(as.character(CCFs_features$Study), as.character(CCFs_features$Study))), 2, simplify = FALSE)
@@ -492,7 +497,7 @@ final_result <- myresult %>%
 final_result$matchtest[final_result$matchtest < .0001] <- "< 0.0001"
 final_result$nonmatchtest[final_result$nonmatchtest < .0001] <- "< 0.0001"
 
-print(xtable(final_result[,1:7], digits = c(0, 0, 0, 0, 0, 4, 0, 4), label = "tab:kstests", caption = "Results for the Kolmogrov-Smirnov distributional test."), comment = FALSE, include.rownames = FALSE, table.placement = 'H')
+print(xtable(final_result[,1:7], digits = c(0, 0, 0, 0, 0, 4, 0, 4), label = "tab:kstests", caption = "Results for the Kolmogorov-Smirnov distributional test."), comment = FALSE, include.rownames = FALSE, table.placement = 'H')
 ```
 
 These results strongly suggest the need for controlling for more effects when performing the analysis. Specifically, microscope operator effects resulting in variations in scan quality and scan parameters seem to play a role in the utlimate performance of the matching algorithm. Land to land comparisons from Hamby252 consistently result in more pronounced expression of features among known matches, and therefore result in higher accuracy in the random forest. Rigorous procedures to ensure scan quality and consistency across operators need to be in place to minimize the effect of the study and ensure that the assumption of land to land independence is satisfied.
@@ -518,7 +523,7 @@ Indeed, another Kolmogorov-Smirnov test confirms a significant difference in the
 ```{r, eval=FALSE, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 mytest <- ks.test(x = result$ideal_crosscut[result$study == "Hamby252"], y = result$ideal_crosscut[result$study == "Hamby44"])
 
-print(xtable(tidy(mytest), digits = c(0, 4, 4, 0, 0), label = "tab:mykstest", caption = "Results for the Kolmogrov-Smirnov distributional test between values of the ideal cross section for Hamby252 compared with Hamby44."), comment = FALSE, include.rownames = FALSE)
+print(xtable(tidy(mytest), digits = c(0, 4, 4, 0, 0), label = "tab:mykstest", caption = "Results for the Kolmogorov-Smirnov distributional test between values of the ideal cross section for Hamby252 compared with Hamby44."), comment = FALSE, include.rownames = FALSE)
 ```
 
 ## Degraded Lands
@@ -551,7 +556,7 @@ CCFs_withlands_plot <- CCFs_withlands_degrade
 CCFs_withlands_plot$match <- factor(CCFs_withlands_plot$match, labels = c("Known Non-Match", "Known Match"))
 ```
 
-Figure \@ref(fig:senspe) gives the sensitivity (true positive rate) and specificity (true negative rate) of the random forest predictions for given levels of degradation. It can be seen that the sensitivity drops a bit until 50% of the land is available and then rises again. This occurs because the algorithm begins producing more positive predictions in general, likely as the result of the ccf being arbitrarily higher for known non-matches due to the small signature. On the other hand, the specificity drops dramatically for left, middle, and right fixed degraded lands when less than 50%. of the land impression is available for examination.  For a more in-depth exploration of the matching probabilities, Figure \@ref(fig:deghist) provides histograms of the matching probability  by  degradation level and by known match versus known non-match categories. The matching probabilities suffer when compared with the probablities obtained from comparisons between full land impressions in all cases. The jump seems to be most noticeable beginning at about 25% degradation (75% land recovered), and the algorithm struggles beyond 50%.
+Figure \@ref(fig:senspe) gives the sensitivity (true positive rate) and specificity (true negative rate) of the random forest predictions for given levels of degradation. It can be seen that the sensitivity drops a bit until 50% of the land is available and then rises again. This occurs because the algorithm begins producing more positive predictions in general, likely as the result of the ccf being arbitrarily higher for known non-matches due to the small signature. On the other hand, the specificity drops dramatically for left, middle, and right fixed degraded lands when less than 50% of the land impression is available for examination.  For a more in-depth exploration of the matching probabilities, Figure \@ref(fig:deghist) provides histograms of the matching probability  by  degradation level and by known match versus known non-match categories. The matching probabilities suffer when compared with the probablities obtained from comparisons between full land impressions in all cases. The jump seems to be most noticeable beginning at about 25% degradation (75% land recovered), and the algorithm struggles beyond 50%.
 
 ```{r deghist, echo=FALSE, fig.cap='Histograms of matching probability, facetted by the degradation level and known match versus known non-match.', fig.height=9.5, fig.width=8, fig.pos='H'}
 p1 <- ggplot(data = filter(CCFs_withlands_plot, degrade_left == 0), aes(x = forest)) +
@@ -644,12 +649,12 @@ To come full circle, we now attempt to match a particular land which exhibits ba
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{images/br9-2-4-greyflip.png}
-\caption{Land 4 of Bullet 2, from Barrel 9 of Hamby Set 252. It can be seen that this particular land exhibits some major tank rash on the right half.}
+\includegraphics[width=\linewidth]{images/br9-2-4-grey.png}
+\caption{Land 4 of Bullet 2, from Barrel 9 of Hamby Set 252. It can be seen that this particular land exhibits some major tank rash on the left half.}
 \label{fig:br924}
 \end{figure}
 
-Table \ref{tab:br924pred} shows the values of the features, after extracting only the first 50% of the Hamby Barrel 9 Bullet 2, 4th land (and hence, simulating a left-fixed 50% degraded scenario), compared with a feature comparison between both full lands (and hence, including the tank rash striae). The features are derived in a comparison with its known match, the complete Bullet 1 third land fired from Barrel 9. The features, including the ccf and the matches, are expressed enough to (barely) indicate a match in the case of the degraded bullet. Using the pre-trained random forest, the predicted matching probability is 52%. This is encouraging in that attempting to match the full bullet land, by comparison, yields a matching probability of 0.0067%. This is due to the relatively higher values of the ccf, cms, and matches for the degraded comparison, and suggests that the feature standardization is working as intended.
+Table \ref{tab:br924pred} shows the values of the features, after extracting only the last 50% of the Hamby Barrel 9 Bullet 2, 4th land (and hence, simulating a right-fixed 50% degraded scenario), compared with a feature comparison between both full lands (and hence, including the tank rash striae). The features are derived in a comparison with its known match, the complete Bullet 1 third land fired from Barrel 9. The features, including the ccf and the matches, are expressed enough to (barely) indicate a match in the case of the degraded bullet. Using the pre-trained random forest, the predicted matching probability is 52%. This is encouraging in that attempting to match the full bullet land, by comparison, yields a matching probability of 0.0067%. This is due to the relatively higher values of the ccf, cms, and matches for the degraded comparison, and suggests that the feature standardization is working as intended.
 
 ```{r, echo=FALSE, results='asis'}
 br924 <- read_x3p("images/Hamby (2009) Barrel/bullets/Br9 Bullet 2-4.x3p")
@@ -839,7 +844,7 @@ P(M) &= 1 - P(NM) \\
      &= 1 - ((1 - P(M1)) \times (1 - P(M2)) \times ... \times (1 - P(M6)))
 \end{align*}
 
-where $M$ is the event that two bullets match, $NM$ is the event that two bullets do not match, $M1$, $M2$, ..., $M6$ are the probabilities of land one, land two, ..., land six matching, and $NM1$, $NM2$, ..., $NM6$ are the probabilities that land one, land two, ..., land six do not match. However, to compute this probability, we need to know the alignment of the two sets of lands. Fortunately, the consistent rotation of the bullet permits this. For instance, if we knew that land 1 of bullet 1 matches land 4 of bullet 2, then we immediately know that land 2 of bullet 1 matches to land 5 of bullet 2, land 3 of bullet 1 matches to land 6 of bullet 2, etc. Hence, we can take look across six diagonals of the $6 \otimes 6$ matrix containing match probabilities. Table \ref{tab:diag} gives an example of the matrix of matching probabilities between two sets of six lands from bullets that are known matches. The matching diagonal is clear based on the high probabilities (cell $(1, 3)$, cell $(2, 4)$, cell $(3, 5)$, etc.) although it can be seen that one of the six comparisons has a relatively lower matching probability. This procedure is based on the Sequence Average Maximum (SAM) by @sensorfar in their bullet matching software application `SensoMatch`. A similar approach using the cross correlation maximum was first proposed by @chu:2010. Compared to that approach, ours uses random forest based probabilities compared to correlation values allowing for elements of probability theory to help determine the resulting bullet match probability.
+where $M$ is the event that two bullets match, $NM$ is the event that two bullets do not match, $M1$, $M2$, ..., $M6$ are the probabilities of land one, land two, ..., land six matching, and $NM1$, $NM2$, ..., $NM6$ are the probabilities that land one, land two, ..., land six do not match. However, to compute this probability, we need to know the alignment of the two sets of lands. Fortunately, the consistent rotation of the bullet permits this. For instance, if we knew that land 1 of bullet 1 matches land 4 of bullet 2, then we immediately know that land 2 of bullet 1 matches to land 5 of bullet 2, land 3 of bullet 1 matches to land 6 of bullet 2, etc. Hence, we can take look across six diagonals of the $6 \otimes 6$ matrix containing match probabilities. Table \ref{tab:diag} gives an example of the matrix of matching probabilities between two sets of six lands from bullets that are known matches. The matching diagonal is clear based on the high probabilities (cell $(1, 3)$, cell $(2, 4)$, cell $(3, 5)$, etc.) although it can be seen that one of the six comparisons has a relatively lower matching probability. This procedure is based on the Sequence Average Maximum (SAM) by @sensofar in their bullet matching software application `SensoMatch`. A similar approach using the cross correlation maximum was first proposed by @chu:2010. Compared to that approach, ours uses random forest based probabilities compared to correlation values allowing for elements of probability theory to help determine the resulting bullet match probability.
 
 ```{r, echo=FALSE, results='asis'}
 result <- CCFs_withlands %>% 
@@ -1010,7 +1015,7 @@ In this paper, we have introduced a set of robust features that can be used to t
 
 While these effects were clearly identified, the best approach to account for them in practice is less clear. In the ideal case, bullets fired from a particular gun barrel should yield surface scans that are of identical quality and properties, regardless of the operator performing the scan. To achieve this, rigorous standards may need to be put in place with regards to the alignment of the bullet under the objective, and the procedure used to scan the bullet surface. To appropriately design a set of best practices requires more research. For instance, because of the significant difference between the placement of the ideal cross section across the two studies, a best practice may specify the margin from the edge of the objective at which the bullet can be placed.
 
-We began exploring the robustness of the matching algorithm proposed in [@2016arXiv160105788H] to land degradation. As suspected, the algorithm performance declines as a function of the rate of degradation. However, there is a relatively clear threshold around about 50%; if 50% of the land or more is recovered, the algorithm still performs reasonably well.  When the proportion of the land that is recovered is below 50%, the accuracy with which we can compare land impressions is low.
+We began exploring the robustness of the matching algorithm proposed in @2016arXiv160105788H to land degradation. As suspected, the algorithm performance declines as a function of the rate of degradation. However, there is a relatively clear threshold around about 50%; if 50% of the land or more is recovered, the algorithm still performs reasonably well.  When the proportion of the land that is recovered is below 50%, the accuracy with which we can compare land impressions is low.
 
 Finally, one pleasing conclusion from these results is the fact that generalizing them to full bullet comparisons rather than the land to land level appears to work quite well. Depending on the assumptions made, the out of sample accuracy of bullet to bullet comparisons can range from nearly perfect to perfect. This result is encouraging in that real world use of these algorithms would be done on the bullet level, assuming enough of the bullet was recovered to make these procedures possible.
 

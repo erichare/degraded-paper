@@ -135,8 +135,8 @@ developing mathematical and statistical approaches to bullet matching.
 One such attempt was the definition of CMS, the Consecutively Matching
 Striae (Biasotti 1959), with a cutoff of six to separate matches from
 non-matches. Still, rigorous assessments of the applicability of such
-cutoffs have not to this point been described (Advisors on Science and
-Technology 2016).
+cutoffs have not to this point been described (President's Council of
+Advisors on Science and Technology 2016).
 
 Recently, several authors have addressed these well-known shortcomings.
 Focusing on firing pin impressions and breech faces, Riva and Champod
@@ -157,12 +157,12 @@ data quality issues, this was still a near ideal test case for the
 algorithm.
 
 Real world applications of bullet matching often involve the recovery of
-fragments of bullets from the crime scene (Council and others 2004).
-Traditional features used in forensic examination work well for a full
-land, but there has been less investigation into their performance in
-the case of a fragmented land. For example, the CMS is naturally limited
-by the portion of the land that can be recovered and varies across
-manufacturers (W. Chu et al. 2011).
+fragments of bullets from the crime scene (National Research Council
+2004). Traditional features used in forensic examination work well for a
+full land, but there has been less investigation into their performance
+in the case of a fragmented land. For example, the CMS is naturally
+limited by the portion of the land that can be recovered and varies
+across manufacturers (W. Chu et al. 2011).
 
 In this paper, we take steps to address these and other concerns.
 Specifically, we begin by reviewing features from the literature,
@@ -170,11 +170,11 @@ computed on pairs of bullet lands, and presenting some of our own
 features. We propose an approach to standardize the featues, to account
 for the fact that only a portion of the land impression may be recovered
 from the crime scene. With the standardized features, we tackle two
-issues that were not addressed in (Hare, Hofmann, and Carriquiry 2016).
+issues that were not addressed in Hare, Hofmann, and Carriquiry (2016).
 The first is the effect of the microscope operator on the resulting
 images and consequent algorithm performance. The second issue has to do
-with the robustness of the land matching algorithm in (Hare, Hofmann,
-and Carriquiry 2016) relative to the degree of degradation of the
+with the robustness of the land matching algorithm in Hare, Hofmann, and
+Carriquiry (2016) relative to the degree of degradation of the
 questioned land impression. Finally, we describe some of the initial
 steps toward generalizing a matching algorithm based on land-to-land
 comparisons, to one based on bullet-to-bullet comparisons, as would be
@@ -462,9 +462,9 @@ not enough to detect the operator effects.
   \hline
 Prediction $\backslash$ Actual & Hamby252\_Hamby252 & Hamby252\_Hamby44 & Hamby44\_Hamby44 \\ 
   \hline
-Hamby252\_Hamby252 & 9.6\% & 8.32\% & 11.28\% \\ 
+Hamby252\_Hamby252 & 09.6\% & 08.32\% & 11.28\% \\ 
   Hamby252\_Hamby44 & 81.47\% & 81.06\% & 78.68\% \\ 
-  Hamby44\_Hamby44 & 8.93\% & 10.63\% & 10.04\% \\ 
+  Hamby44\_Hamby44 & 08.93\% & 10.63\% & 10.04\% \\ 
    \hline
 \end{tabular}
 \caption{Confusion Matrix (Column Proportions) for the random forest with study as the response. It can be seen that the random forest performs poorly, as hoped, indicating that a simple model to predict the study using the features available is not enough to detect the operator effects.} 
@@ -488,7 +488,7 @@ match, for different study to study comparisons of lands.}
 \end{figure}
 
 Though visual inspection clearly shows differences, we can more formally
-assess the differences between distributions with a Kolmogrov-Smirnov
+assess the differences between distributions with a Kolmogorov-Smirnov
 test. Table \ref{tab:kstests} gives the results of pairwise tests, for
 each feature, between different set comparisons, and between known
 matches compared with known non-matches. Although most of the tests are
@@ -528,7 +528,7 @@ H252\_H252 & H252\_H44 & ccf & $<$ 0.0001 & 0.2723 & 1e-04 & 0.0189 \\
   H252\_H44 & H44\_H44 & sum\_peaks & 0.047 & 0.1011 & 0.006 & 0.0147 \\ 
    \hline
 \end{tabular}
-\caption{Results for the Kolmogrov-Smirnov distributional test.} 
+\caption{Results for the Kolmogorov-Smirnov distributional test.} 
 \label{tab:kstests}
 \end{table}
 
@@ -590,7 +590,7 @@ occurs because the algorithm begins producing more positive predictions
 in general, likely as the result of the ccf being arbitrarily higher for
 known non-matches due to the small signature. On the other hand, the
 specificity drops dramatically for left, middle, and right fixed
-degraded lands when less than 50\%. of the land impression is available
+degraded lands when less than 50\% of the land impression is available
 for examination. For a more in-depth exploration of the matching
 probabilities, Figure \ref{fig:deghist} provides histograms of the
 matching probability by degradation level and by known match versus
@@ -664,14 +664,14 @@ known match.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{images/br9-2-4-greyflip.png}
-\caption{Land 4 of Bullet 2, from Barrel 9 of Hamby Set 252. It can be seen that this particular land exhibits some major tank rash on the right half.}
+\includegraphics[width=\linewidth]{images/br9-2-4-grey.png}
+\caption{Land 4 of Bullet 2, from Barrel 9 of Hamby Set 252. It can be seen that this particular land exhibits some major tank rash on the left half.}
 \label{fig:br924}
 \end{figure}
 
 Table \ref{tab:br924pred} shows the values of the features, after
-extracting only the first 50\% of the Hamby Barrel 9 Bullet 2, 4th land
-(and hence, simulating a left-fixed 50\% degraded scenario), compared
+extracting only the last 50\% of the Hamby Barrel 9 Bullet 2, 4th land
+(and hence, simulating a right-fixed 50\% degraded scenario), compared
 with a feature comparison between both full lands (and hence, including
 the tank rash striae). The features are derived in a comparison with its
 known match, the complete Bullet 1 third land fired from Barrel 9. The
@@ -867,7 +867,7 @@ specify the margin from the edge of the objective at which the bullet
 can be placed.
 
 We began exploring the robustness of the matching algorithm proposed in
-(Hare, Hofmann, and Carriquiry 2016) to land degradation. As suspected,
+Hare, Hofmann, and Carriquiry (2016) to land degradation. As suspected,
 the algorithm performance declines as a function of the rate of
 degradation. However, there is a relatively clear threshold around about
 50\%; if 50\% of the land or more is recovered, the algorithm still
@@ -897,12 +897,6 @@ matching algorithm in order to improve its performance in real datasets.
 \addcontentsline{toc}{section}{References}
 
 \hypertarget{refs}{}
-\hypertarget{ref-pcast2016}{}
-Advisors on Science, President's Council of, and Technology. 2016.
-``Report on Forensic Science in Criminal Courts: Ensuring Scientific
-Validity of Feature-Comparison Methods.''
-\url{https://www.whitehouse.gov/sites/default/files/microsites/ostp/PCAST/pcast_forensic_science_report_final.pdf}.
-
 \hypertarget{ref-biasotti:1959}{}
 Biasotti, Alfred A. 1959. ``A Statistical Study of the Individual
 Characteristics of Fired Bullets.'' \emph{Journal of Forensic Sciences}
@@ -931,10 +925,6 @@ Clarkson, James A, and C Raymond Adams. 1933. ``On Definitions of
 Bounded Variation for Functions of Two Variables.'' \emph{Transactions
 of the American Mathematical Society} 35 (4). JSTOR: 824--54.
 
-\hypertarget{ref-national2004forensic}{}
-Council, National Research, and others. 2004. \emph{Forensic Analysis:
-Weighing Bullet Lead Evidence}. National Academies Press.
-
 \hypertarget{ref-giannelli:2011}{}
 Giannelli, Paul C. 2011. ``Ballistics Evidence Under Fire.''
 \emph{Criminal Justice} 25 (4): 50--51.
@@ -960,10 +950,13 @@ Liaw, Andy, and Matthew Wiener. 2002. ``Classification and Regression by
 RandomForest.'' \emph{R News} 2 (3): 18--22.
 \url{http://CRAN.R-project.org/doc/Rnews/}.
 
+\hypertarget{ref-national2004forensic}{}
+National Research Council. 2004. \emph{Forensic Analysis: Weighing
+Bullet Lead Evidence}. National Academies Press.
+
 \hypertarget{ref-NAS:2009}{}
-National Research Council. 2009. \emph{Strengthening Forensic Science in
-the United States: A Path Forward}. Washington, DC: The National
-Academies Press.
+---------. 2009. \emph{Strengthening Forensic Science in the United
+States: A Path Forward}. Washington, DC: The National Academies Press.
 doi:\href{https://doi.org/10.17226/12589}{10.17226/12589}.
 
 \hypertarget{ref-petraco:2012}{}
@@ -971,13 +964,19 @@ Petraco, Nicholas, and Helen Chan. 2012. \emph{Application of Machine
 Learning to Toolmarks: Statistically Based Methods for Impression
 Pattern Comparisons}. Mannheim, Germany: Bibliographisches Institut AG.
 
+\hypertarget{ref-pcast2016}{}
+President's Council of Advisors on Science and Technology. 2016.
+``Report on Forensic Science in Criminal Courts: Ensuring Scientific
+Validity of Feature-Comparison Methods.''
+\url{https://www.whitehouse.gov/sites/default/files/microsites/ostp/PCAST/pcast_forensic_science_report_final.pdf}.
+
 \hypertarget{ref-riva:2014}{}
 Riva, Fabiano, and Christophe Champod. 2014. ``Automatic Comparison and
 Evaluation of Impressions Left by a Firearm on Fired Cartridge Cases.''
 \emph{Journal of Forensic Sciences} 59 (3): 637--47.
 doi:\href{https://doi.org/10.1111/1556-4029.12382}{10.1111/1556-4029.12382}.
 
-\hypertarget{ref-sensorfar}{}
+\hypertarget{ref-sensofar}{}
 Sensorfar. 2017. \emph{SensoMATCH Bullet Comparison Software}.
 
 \hypertarget{ref-vorburger:2011}{}
