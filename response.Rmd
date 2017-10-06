@@ -1,11 +1,17 @@
 ---
-title: "Response to reviewers"
+title: "Reviewer Response and Acknowledgment"
 author: "Eric Hare, Heike Hofmann, Alicia Carriquiry"
 date: "October 5th, 2017"
 output:
   pdf_document: default
 bibliography: references.bib
 ---
+
+# Acknowledgment
+
+We wanted to begin by acknowledging the reviewers. The reviews were very thorough and immensely helpful despite being done in a very short time frame. We greatly appreciate the extra effort put forth in order to help us get this manuscript included in the special issue.
+
+This great feedback has allowed us to effectively revise the paper. We hope that you find the revised version of the manuscript substantially improved. Below, we have addressed the individual points raised by the two reviewers.
 
 # Reviewer 1
 
