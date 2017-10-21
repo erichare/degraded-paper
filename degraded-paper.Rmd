@@ -1100,7 +1100,10 @@ ggplot(data = final_result, aes(x = match, y = score, fill = match)) +
     theme_bw() +
     theme(legend.background = element_rect(colour="grey75"),
           axis.text.y = element_blank(),
-          axis.title.y = element_blank())
+          axis.title.y = element_blank()) +
+  theme(legend.position="none") +
+  annotate("text", x=2.25, y= 0.8, label="Known matches (KM)", hjust=1, colour="grey40") +
+  annotate("text", x=0.75, y= 0.05, label="Known non-matches (KNM)", hjust=0, colour="grey40")
 ```
 
 # Conclusion
