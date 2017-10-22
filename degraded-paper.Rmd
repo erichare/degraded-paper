@@ -1025,6 +1025,8 @@ As we have stated before, the lack of 3D images of bullets available in the publ
 
 We wish to acknowledge the anonymous reviewers, whose quick yet thorough and immensely helpful reviews helped us improve this manuscript. We greatly appreciate the extra effort put forth for us.
 
+This research was partially funded by the Center for Statistics and Applications in Forensic Evidence (CSAFE) through Cooperative Agreement \#70NANB15H176 between NIST and Iowa State University, which includes activities carried out at Carnegie Mellon University, University of California Irvine, and University of Virginia.
+
 \clearpage
 
 # References
