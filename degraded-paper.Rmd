@@ -115,18 +115,28 @@ ys <- intersect(prof1_zeroed$y, prof2_zeroed$y)
 final_doublesmoothed <- doublesmoothed %>%
     filter(y %in% ys)
 
+custom <- list(
+  theme_bw(),
+  scale_linetype_manual(values=3:2),
+  scale_colour_manual(values=c("black", "grey40")),
+  ylab(expression(paste("Relative Height (in ",mu,m,")", sep=""))), 
+  xlab(expression(paste("Relative Location (in ",mu,m,")", sep="")))
+  )
+
 p1 <- ggplot(data = final_profs, aes(x = y, y = l30, colour = profile_id)) +
-    geom_line() +
-    theme_bw()
+    geom_line(aes(linetype=profile_id)) +
+    custom
 
 p2 <- ggplot(data = final_doublesmoothed, aes(x = y, y = l30, colour = profile_id)) +
-    geom_line() +
-    geom_smooth(inherit.aes = FALSE, aes(x = y, y = avgl30), colour = "purple") +
-    theme_bw()
+    geom_line(aes(linetype=profile_id)) +
+    geom_smooth(inherit.aes = FALSE, aes(x = y, y = avgl30), size = .5, se=FALSE, colour="black") +
+    custom
 
 p3 <- ggplot(data = final_doublesmoothed, aes(x = y, y = l50, colour = profile_id)) +
-    geom_line() +
-    theme_bw()
+    geom_line(aes(linetype=profile_id)) +
+    geom_hline(yintercept=0, size = .5, colour="black") +
+    custom +
+  ylab("Adjusted relative height")
 
 grid.arrange(p1, p2, p3, nrow = 3)
 ```
@@ -168,18 +178,28 @@ ys <- intersect(prof1_zeroed$y, prof2_zeroed$y)
 final_doublesmoothed <- doublesmoothed %>%
     filter(y %in% ys)
 
+custom <- list(
+  theme_bw(),
+  scale_linetype_manual(values=3:2),
+  scale_colour_manual(values=c("black", "grey40")),
+  ylab(expression(paste("Relative Height (in ",mu,m,")", sep=""))), 
+  xlab(expression(paste("Relative Location (in ",mu,m,")", sep="")))
+  )
+
 p1 <- ggplot(data = final_profs, aes(x = y, y = l30, colour = profile_id)) +
-    geom_line() +
-    theme_bw()
+    geom_line(aes(linetype=profile_id)) +
+    custom
 
 p2 <- ggplot(data = final_doublesmoothed, aes(x = y, y = l30, colour = profile_id)) +
-    geom_line() +
-    geom_smooth(inherit.aes = FALSE, aes(x = y, y = avgl30), colour = "purple") +
-    theme_bw()
+    geom_line(aes(linetype=profile_id)) +
+    geom_smooth(inherit.aes = FALSE, aes(x = y, y = avgl30), size = .5, se=FALSE, colour="black") +
+    custom
 
 p3 <- ggplot(data = final_doublesmoothed, aes(x = y, y = l50, colour = profile_id)) +
-    geom_line() +
-    theme_bw()
+    geom_line(aes(linetype=profile_id)) +
+    geom_hline(yintercept=0, size = .5, colour="black") +
+    custom +
+  ylab("Adjusted relative height")
 
 grid.arrange(p1, p2, p3, nrow = 3)
 ```
@@ -208,20 +228,27 @@ CCFs_withlands <- ccf %>%
 
 We can observe the distributions of both CCF and the Roughness Correlation side by side, differentiating between known matches and known non-matches. Figure \@ref(fig:roughcordist) displays this as an empirical CDF plot. It can be seen that the separation of known matches and known non-matches along both the CCF and the Roughness Correlation is quite strong and follows similar distributions (the known non-matches are relatively symmetric, while the known matches are very skewed left). However, some known non-matches with CCF values that would typically be indicative of a match have relatively lower values for the Roughness Correlation, which indicates that this feature could provide some added value when it comes to discriminating between matches and non-matches.
 
-```{r roughcordist, echo=FALSE, fig.cap='Empirical CDFs of the Roughness Correlation compared to the CCF for known matches and known non-matches. It can be seen that the distribution of each feature for the known non-matches is quite symmetric, while the distribution for each feature for the known matches is skewed left.'}
+```{r roughcordist, echo=FALSE, out.width='.5\\textwidth',  fig.cap='Empirical CDFs of the Roughness Correlation compared to the CCF for known matches and known non-matches. It can be seen that the distribution of each feature for the known non-matches is quite symmetric, while the distribution for each feature for the known matches is skewed left.'}
 cor_compare <- CCFs_withlands %>%
   select(ccf, rough_cor, match) %>%
   gather(key = feature, value = value, ccf, rough_cor) %>%
   mutate(match = factor(match, labels = c("Known non-matches (KNM)", "Known matches (KM)")))
 
-ggplot(data = cor_compare, aes(x = value, color = match)) +
+custom <- list(
+  theme_bw(),
+  scale_linetype_manual("Bullet Land Pairs", values=3:2),
+  scale_colour_manual("Bullet Land Pairs", values=c("black", "grey40"))
+  )
+
+ggplot(data = cor_compare, aes(x = value, colour=match, linetype = match)) +
   stat_ecdf() +
   facet_wrap(~feature, nrow = 2) +
-  theme_bw() + ylab("") + xlab("") +
-  scale_color_brewer("Bullet Land Pairs", palette="Paired") +
+  ylab("") + xlab("") +
   theme(legend.background = element_rect(colour="grey75"),
         axis.title.y=element_blank(),
-        plot.margin = unit(c(0,0,0,0), unit="cm"))
+        plot.margin = unit(c(0,0,0,0), unit="cm")) +
+  custom +
+    theme(legend.position=c(0.2, 0.85)) 
 ```
 
 # Model Training
@@ -337,35 +364,91 @@ pcp_data_tall <- pcp_data %>%
 CCFs_tall <- CCFs_test_normalized %>%
   mutate(id = 1:nrow(.)) %>%
   select(id, everything()) %>%
-  gather(key = Feature, value = Value, 3:ncol(.))
+  gather(key = Feature, value = Value, 3:ncol(.)) %>%
+  mutate(x = as.numeric(as.factor(Feature))) 
+
+truepos <- filter(CCFs_tall, Type %in% c("True Positive"))
+falsepos <- filter(CCFs_tall, Type %in% c("False Positive"))
+
+truepos_poly <- truepos %>% 
+  group_by(Feature) %>% 
+  summarize(min = min(Value), max=max(Value), mean=mean(Value), x=x[1])
+tpps <- truepos_poly %>% gather(Type, Result, min:max)
+tpps$order <-c(1:8, 9+8:1)
+tpps$x <-c(1:8, 1:8)
+
+tpps <- tpps %>% arrange(order) 
 
 p1 <- ggplot() +
-  geom_line(data = filter(CCFs_tall, Type %in% c("True Positive")), aes(x = Feature, y = Value, colour = Type, group = id), alpha = 0.1, size = 0.2, linetype = "dashed") +
-  geom_line(data = filter(CCFs_tall, Type %in% c("False Positive")), aes(x = Feature, y = Value, colour = Type, group = id), alpha = 1, size = 0.8, linetype = "dashed") +
-  geom_line(data = filter(pcp_data_tall, Type %in% c("True Positive")), aes(x = Feature, y = Value, colour = Type, group = Type), size = 2) +
+  geom_polygon(aes(x = x, y=Result), data = tpps, fill="grey50", alpha=.35) +
+  geom_line(aes(x = x, y = mean), data = truepos_poly, colour="grey50", size=1) +
+  geom_line(data = truepos, aes(x = x, y = Value, colour = Type, group = id, linetype=Type), alpha = 0.1, size = 0.2) + #, linetype = "dashed") +
+  scale_x_continuous(breaks=1:8, labels=unique(tpps$Feature)) +
+  geom_line(data = falsepos, aes(x = x, y = Value, colour = Type, group = id, linetype=Type), alpha = 1, size = 0.8) +
   ylab("Normalized Value") +
+  xlab("") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_color_manual(values = c("#e60000", "#000099")) +
-  scale_size_manual(values = c(1, 1))
+  scale_color_manual(values = c("grey10", "grey50")) +
+#  scale_color_manual(values = c("#e60000", "#000099")) +
+  scale_size_manual(values = c(1, 1)) +
+  scale_linetype_manual(values=2:1)
+
+# p1 <- ggplot() +
+# #  geom_polygon(aes(x = x, y=Result), data = tpps, fill="#000099", alpha=.5) +
+#   geom_line(data = truepos, aes(x = Feature, y = Value, colour = Type, group = id), alpha = 0.1, size = 0.2, linetype = "dashed") +
+#   geom_line(data = falsepos, aes(x = Feature, y = Value, colour = Type, group = id), alpha = 1, size = 0.8, linetype = "dashed") +
+#   geom_line(data = filter(pcp_data_tall, Type %in% c("True Positive")), aes(x = Feature, y = Value, colour = Type, group = Type), size = 2) +
+#   ylab("Normalized Value") +
+#   theme_bw() +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+#   scale_color_manual(values = c("#e60000", "#000099")) +
+#   scale_size_manual(values = c(1, 1))
 
 set.seed(20170222)
 mysamp1 <- sample(CCFs_tall$id[CCFs_tall$Type == "True Negative"], 226)
 mysamp2 <- sample(CCFs_tall$id[CCFs_tall$Type == "False Negative"], 20)
+
+CCFs_tall <- CCFs_tall %>% mutate(x = as.numeric(as.factor(Feature)))
+
 trueneg_sample <- CCFs_tall %>%
-  filter(id %in% mysamp1)
+  filter(id %in% mysamp1) 
 falseneg_sample <- CCFs_tall %>% 
   filter(id %in% mysamp2)
 
+trueneg_poly <- trueneg_sample %>% 
+  group_by(Feature) %>% 
+  summarize(min = min(Value), max=max(Value), mean=mean(Value), x=x[1])
+tnps <- trueneg_poly %>% gather(Type, Result, min:max)
+tnps$order <-c(1:8, 9+8:1)
+tnps$x <-c(1:8, 1:8)
+
+tnps <- tnps %>% arrange(order) 
+
 p2 <- ggplot() +
-  #geom_line(data = filter(CCFs_tall, Type %in% c("True Negative", "False Negative")), aes(x = Feature, y = Value, colour = Type, group = id, alpha = Type, size = Type)) +
-  geom_line(data = trueneg_sample, aes(x = Feature, y = Value, colour = Type, group = id), alpha = 0.1, size = 0.2, linetype = "dashed") +
-  geom_line(data = falseneg_sample, aes(x = Feature, y = Value, colour = Type, group = id), alpha = 1, size = 0.4, linetype = "dashed") +
-  theme_bw() +
-  geom_line(data = filter(pcp_data_tall, Type %in% c("True Negative")), aes(x = Feature, y = Value, colour = Type, group = Type), size = 2) +
+  geom_polygon(aes(x = x, y=Result), data = tnps, fill="grey50", alpha=.35) +
+  geom_line(aes(x = x, y = mean), data = trueneg_poly, colour="grey50", size=1) +
+  geom_line(data = trueneg_sample, aes(x = x, y = Value, colour = Type, group = id, linetype=Type), alpha = 0.1, size = 0.2) + #, linetype = "dashed") +
+scale_x_continuous(breaks=1:8, labels=unique(tpps$Feature)) +
+  geom_line(data = falseneg_sample, aes(x = x, y = Value, colour = Type, group = id, linetype=Type), alpha = 1, size = 0.8) +
   ylab("Normalized Value") +
+  xlab("") +
+  theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_color_manual(values = c("#e60000", "#000099"))
+  scale_color_manual(values = c("grey10", "grey50")) +
+#  scale_color_manual(values = c("#e60000", "#000099")) +
+  scale_size_manual(values = c(1, 1)) +
+  scale_linetype_manual(values=2:1)
+  
+# p2 <- ggplot() +
+#   #geom_line(data = filter(CCFs_tall, Type %in% c("True Negative", "False Negative")), aes(x = Feature, y = Value, colour = Type, group = id, alpha = Type, size = Type)) +
+#   geom_line(data = trueneg_sample, aes(x = Feature, y = Value, colour = Type, group = id), alpha = 0.1, size = 0.2, linetype = "dashed") +
+#   geom_line(data = falseneg_sample, aes(x = Feature, y = Value, colour = Type, group = id), alpha = 1, size = 0.4, linetype = "dashed") +
+#   theme_bw() +
+#   geom_line(data = filter(pcp_data_tall, Type %in% c("True Negative")), aes(x = Feature, y = Value, colour = Type, group = Type), size = 2) +
+#   ylab("Normalized Value") +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+#   scale_color_manual(values = c("#e60000", "#000099"))
 
 grid.arrange(p1, p2, nrow = 2)
 ```
@@ -592,13 +675,15 @@ result <- CCFs_withlands_degrade %>%
 result$value[1:2] <- c(sens_result, spec_result)
 
 ## Produce plot
-ggplot(result, aes(x = level, y = value, colour = fixed)) +
+ggplot(result, aes(x = level, y = value, colour = fixed, linetype=fixed)) +
     facet_wrap(~metric, nrow = 2) +
     geom_point() +
     geom_line() +
     theme_bw() +
     scale_x_continuous(breaks = c(0, .125, .25, .375, .5, .625, .75), labels = c("100%", "87.5%", "75%", "62.5%", "50%", "37.5%", "25%")) +
-    xlab("Land Proportion")
+    xlab("Land Proportion") +
+  scale_colour_manual(values=c("black", "grey20", "grey30", "grey40")) +
+  theme(legend.key.width=unit(3,"line"))
 ```
 
 Figure \@ref(fig:featexp) gives feature expression for known matches, as a function of the proportion of land impression recovered. It is immediately obvious that the variability in feature expression is large when only a small fraction of the land is recovered, such as 25%. For instance, `sum_peaks` and  `cms` both drop, while `D` rises. Interestingly, some of the features are better expressed for the middle-fixed case. Overall, feature expression remains relatively consistent as long as we recover 50% or more of the land impression. Feature \@ref(fig:featexp2) shows the feature expression for known non-matches by comparison. The non-matches don't exhibit the same pattern of better feature expression for the middle-fixed case, except perhaps for very low degradation levels. However, feature expression rises as a function of the land proportion, which indicates why the random forest begins predicting more positives, raising the sensitivity, but drastically lowering the specificity.
@@ -614,14 +699,17 @@ feature_exp <- CCFs_withlands_degrade %>%
     mutate(fixed = ifelse(degrade_left == 0 & degrade_right == 0, "full", ifelse(degrade_left == 0, "left", ifelse(degrade_right == 0, "right", "middle"))),
            level = degrade_left + degrade_right)
 
-ggplot(data = feature_exp, aes(x = level, y = value, colour = fixed)) +
+ggplot(data = feature_exp, aes(x = level, y = value, colour = fixed, linetype=fixed)) +
     geom_point() +
     geom_line() +
     theme_bw() +
     theme(legend.position = "bottom") +
     scale_x_continuous(breaks = c(0, .25, .5, .75), labels = c("100%", "75%", "50%", "25%")) +
     xlab("Land Proportion") +
-    facet_wrap(~feature, scales = "free_y")
+    facet_wrap(~feature, scales = "free_y") +
+    scale_colour_manual(values=c("black", "grey20", "grey30", "grey40")) +
+  theme(legend.key.width=unit(3,"line"))
+
 ```
 
 ```{r featexp2, echo=FALSE, fig.cap='Feature expression for known non-matches, as a function of land proportion. As expected by the fact that the false positive rate increases as the land proportion decreases, so too does the feature expression. However, unlike for the known matches, fixing the middle portion of the land does not seem to lead to more expressed features, except perhaps for very low degradation levels.'}
@@ -635,14 +723,17 @@ feature_exp2 <- CCFs_withlands_degrade %>%
     mutate(fixed = ifelse(degrade_left == 0 & degrade_right == 0, "full", ifelse(degrade_left == 0, "left", ifelse(degrade_right == 0, "right", "middle"))),
            level = degrade_left + degrade_right)
 
-ggplot(data = feature_exp2, aes(x = level, y = value, colour = fixed)) +
+ggplot(data = feature_exp2, aes(x = level, y = value, colour = fixed, linetype=fixed)) +
     geom_point() +
     geom_line() +
     theme_bw() +
     theme(legend.position = "bottom") +
     scale_x_continuous(breaks = c(0, .25, .5, .75), labels = c("100%", "75%", "50%", "25%")) +
     xlab("Land Proportion") +
-    facet_wrap(~feature, scales = "free_y")
+    facet_wrap(~feature, scales = "free_y") +
+    scale_colour_manual(values=c("black", "grey20", "grey30", "grey40")) +
+  theme(legend.key.width=unit(3,"line"))
+
 ```
 
 To come full circle, we now attempt to match a particular land which exhibits bad tank rash. Figure \@ref(fig:br924) provides an image of the surface of this land impression. Due to the tank rash, this particular land impression was originally excluded from consideration (see [@2016arXiv160105788H]) based on our subjective assessment of the quality of the land. However, it appears that approximately half of the bullet land remains relatively unaffected. We extract a signature from the unaffected half and attempt to match this signature to its full known match.
@@ -831,9 +922,12 @@ ggplot(data = result, aes(x = match, y = score, fill = match)) +
     coord_flip() +
     scale_fill_brewer("Bullet Land Pairs", palette="Paired") +
     theme_bw() +
-    theme(legend.background = element_rect(colour="grey75"),
+    theme(legend.position="none",
           axis.text.y = element_blank(),
-          axis.title.y = element_blank())
+          axis.title.y = element_blank()) +
+  annotate("text", x=2.25, y= 0.8, label="Known matches (KM)", hjust=1, colour="grey40") +
+  annotate("text", x=0.75, y= 0.05, label="Known non-matches (KNM)", hjust=0, colour="grey40")
+
 ```
 
 We can improve on this approach by exploiting the rotation of the bullet to compute a score. Under the assumption of land to land independence, we can define the probability that two bullets match (M) as one minus the probability that the two bullets do not match (NM). Exploiting the idea that when two bullets do not match, none of the individual lands match either, we can write the matching probability as the probability that at least one land pair in the matrix matches. Specifically,
@@ -996,8 +1090,19 @@ final_result <- method1 %>%
   mutate(method = rep(1:4, each = nrow(method1)),
          match = factor(match, labels = c("Known non-matches (KNM)", "Known matches (KM)")))
 
-mypaste <- function(strings) { paste("Method", strings) }
+dframe <- data.frame(expand.grid(match=c("Known non-matches (KNM)", "Known matches (KM)"), method=1:4))
+dframe$x <- c(0.75, 2.25)[as.numeric(as.factor(dframe$match))]
+dframe$y <- c(0.15, 0.9)[as.numeric(as.factor(dframe$match))]
+idx <- with(dframe, which(method==1 & match=="Known non-matches (KNM)"))
+dframe$y[idx] <- 0.2
+idx <- with(dframe, which(method==1 & match=="Known matches (KM)"))
+dframe$y[idx] <- 0.875
+idx <- with(dframe, which(method==3 & match=="Known matches (KM)"))
+dframe$y[idx] <- 0.7
+idx <- with(dframe, which(method==4 & match=="Known matches (KM)"))
+dframe$x[idx] <- 1.45
 
+mypaste <- function(strings) { paste("Method", strings) }
 ggplot(data = final_result, aes(x = match, y = score, fill = match)) +
     geom_boxplot() +
     coord_flip() +
@@ -1006,7 +1111,10 @@ ggplot(data = final_result, aes(x = match, y = score, fill = match)) +
     theme_bw() +
     theme(legend.background = element_rect(colour="grey75"),
           axis.text.y = element_blank(),
-          axis.title.y = element_blank())
+          axis.title.y = element_blank()) +
+  theme(legend.position="none") +
+  geom_text(aes(x=x,y=y, label=match), colour="grey40", data=dframe)
+
 ```
 
 # Conclusion
