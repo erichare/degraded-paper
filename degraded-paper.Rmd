@@ -1090,8 +1090,19 @@ final_result <- method1 %>%
   mutate(method = rep(1:4, each = nrow(method1)),
          match = factor(match, labels = c("Known non-matches (KNM)", "Known matches (KM)")))
 
-mypaste <- function(strings) { paste("Method", strings) }
+dframe <- data.frame(expand.grid(match=c("Known non-matches (KNM)", "Known matches (KM)"), method=1:4))
+dframe$x <- c(0.75, 2.25)[as.numeric(as.factor(dframe$match))]
+dframe$y <- c(0.15, 0.9)[as.numeric(as.factor(dframe$match))]
+idx <- with(dframe, which(method==1 & match=="Known non-matches (KNM)"))
+dframe$y[idx] <- 0.2
+idx <- with(dframe, which(method==1 & match=="Known matches (KM)"))
+dframe$y[idx] <- 0.875
+idx <- with(dframe, which(method==3 & match=="Known matches (KM)"))
+dframe$y[idx] <- 0.7
+idx <- with(dframe, which(method==4 & match=="Known matches (KM)"))
+dframe$x[idx] <- 1.45
 
+mypaste <- function(strings) { paste("Method", strings) }
 ggplot(data = final_result, aes(x = match, y = score, fill = match)) +
     geom_boxplot() +
     coord_flip() +
@@ -1102,8 +1113,8 @@ ggplot(data = final_result, aes(x = match, y = score, fill = match)) +
           axis.text.y = element_blank(),
           axis.title.y = element_blank()) +
   theme(legend.position="none") +
-  annotate("text", x=2.25, y= 0.8, label="Known matches (KM)", hjust=1, colour="grey40") +
-  annotate("text", x=0.75, y= 0.05, label="Known non-matches (KNM)", hjust=0, colour="grey40")
+  geom_text(aes(x=x,y=y, label=match), colour="grey40", data=dframe)
+
 ```
 
 # Conclusion
